@@ -13,7 +13,9 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        // 
+        $categories= Category::withCount('books')->latest()->paginate(10);
+        return view('admin.categories.index',compact('categories'));
     }
 
     /**
@@ -22,6 +24,7 @@ class CategoryController extends Controller
     public function create()
     {
         //
+       return view('admin.categories.create');
     }
 
     /**
@@ -30,6 +33,13 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         //
+        $data =$request->validate([
+            'name'=>'required|string|max:255'
+        ]);
+
+        Category::create($data);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Added successfully');
     }
 
     /**
@@ -38,6 +48,8 @@ class CategoryController extends Controller
     public function show(Category $category)
     {
         //
+        $category->load('books');
+        return view('admin.categories.show', compact('category'));
     }
 
     /**
@@ -46,6 +58,7 @@ class CategoryController extends Controller
     public function edit(Category $category)
     {
         //
+         return view('admin.categories.edit', compact('category'));
     }
 
     /**
@@ -54,6 +67,13 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         //
+         $data =$request->validate([
+            'name'=>'required|string|max:255'
+        ]);
+
+        Category::update($data);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Updated successfully');
     }
 
     /**
@@ -62,5 +82,7 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         //
+        $category->delete();
+         return redirect()->route('admin.categories.index')->with('success', 'Deleted successfully');
     }
 }
